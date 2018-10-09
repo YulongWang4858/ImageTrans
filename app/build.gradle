@@ -13,7 +13,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-frtti -fexceptions"
-                version "3.7.1"
+                abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
             }
         }
     }
@@ -31,10 +31,11 @@ android {
     dataBinding {
         enabled = true
     }
+//    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jniLibs/'] } }
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -43,4 +44,5 @@ dependencies {
     api 'com.android.support:design:26.1.0'
     testImplementation 'junit:junit:4.12'
     api 'net.schmizz:sshj:0.10.0'
+    api project(':openCVLibrary343')
 }

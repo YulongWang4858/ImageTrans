@@ -23,7 +23,6 @@ import android.view.Surface;
 import com.example.wangyulong.imagetrans.Constant.ControlConstants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CameraDeviceHelper

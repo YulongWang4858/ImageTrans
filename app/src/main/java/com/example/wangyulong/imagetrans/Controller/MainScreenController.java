@@ -37,7 +37,7 @@ public class MainScreenController extends BasicController
 
     //region APIs
 
-    // permission was granted prior to this API call
+    // permission was to be granted prior to this API call
     @SuppressLint("MissingPermission")
     public void OpenCamera(CameraManager manager, SurfaceTexture texture, int deviceRotation)
     {

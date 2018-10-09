@@ -1,5 +1,8 @@
 #include <jni.h>
 #include <string>
+#include <iostream>
+#include <vector>
+#include <opencv2/opencv.hpp>
 
 extern "C"
 JNIEXPORT jstring JNICALL

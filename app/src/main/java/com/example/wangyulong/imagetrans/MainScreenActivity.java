@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -19,6 +20,9 @@ import android.widget.TextView;
 import com.example.wangyulong.imagetrans.Constant.ControlConstants;
 import com.example.wangyulong.imagetrans.Controller.MainScreenController;
 import com.example.wangyulong.imagetrans.databinding.ActivityMainScreenBinding;
+
+import org.opencv.android.OpenCVLoader;
+import org.opencv.features2d.FastFeatureDetector;
 
 public class MainScreenActivity extends AppCompatActivity
 {
@@ -63,12 +67,8 @@ public class MainScreenActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-//        startBackgroundThread();
-//
-//        if (this.binding.textureView.isAvailable())
-//        {
-//            controller.OpenCamera();
-//        }
+
+        //TODO: Resume camera background thread if necessary
     }
     //endregion Overrides
 
@@ -86,6 +86,7 @@ public class MainScreenActivity extends AppCompatActivity
     {
         this.controller = MainScreenController.get_instance();
 
+        // TODO: Link up event states
         this.binding.textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener()
         {
             @Override
@@ -148,10 +149,27 @@ public class MainScreenActivity extends AppCompatActivity
     }
     //endregion Methods
 
-    // TODO: Remove after testing
+    // TODO: Remove afterwards
     // Used to load the 'native-lib' library on application startup.
     static
     {
         System.loadLibrary("native-lib");
+    }
+
+    static
+    {
+        System.loadLibrary("opencv_java3");
+    }
+
+    static
+    {
+        if (!OpenCVLoader.initDebug())
+        {
+            Log.d("MainScreenActivity : ", "OpenCV not loaded");
+        }
+        else
+        {
+            Log.d("MainScreenActivity : ", "OpenCV loaded");
+        }
     }
 }
