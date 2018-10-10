@@ -1,6 +1,7 @@
 package com.example.wangyulong.imagetrans.Helper;
 
 import android.annotation.SuppressLint;
+import android.databinding.ObservableField;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -17,11 +18,12 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Size;
-import android.util.SparseIntArray;
 import android.view.Surface;
 
 import com.example.wangyulong.imagetrans.Constant.ControlConstants;
+import com.example.wangyulong.imagetrans.Model.ImageModel;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +42,10 @@ public class CameraDeviceHelper
     private int net_orientation = 0;
     private ImageReader image_reader;
     private HandlerThread background_handler_thread;
+    private ObservableField<ImageModel> observableImage;
+
+    // OpenCv keypoint detection
+    private native int featureDetection(long mat_img_ptr);
 
     // new image event
     private ImageReader.OnImageAvailableListener imageAvailableListener = new ImageReader.OnImageAvailableListener()
@@ -54,21 +60,26 @@ public class CameraDeviceHelper
             {
                 Log.d("CameraDeviceHelper : ", "OpenCamera -> New image read successfully");
 
-                //TODO: Remove after testing
+                // create byte buffer to convert img to opencvMat
+                ByteBuffer byte_buffer = new_image.getPlanes()[0].getBuffer();
+                byte[] byte_arr = new byte[byte_buffer.remaining()];
 
+                // convert Image to Mat
+                ImageModel imageModel = new ImageModel(new_image);
+
+                // compute features (keypoints in this case) detected
+                int features_detected = featureDetection(imageModel.getMat_img().getNativeObjAddr());
+                imageModel.setNum_features(features_detected);
+                observableImage.set(imageModel);
+
+                // TODO: Remove after debug
+                Log.d("CameraDeviceHelper : ", "ImageAvailble --> features detected " + features_detected + " with by buffer length of " + byte_arr.length);
+
+                // must call close(), else fails after reading the first 5 images
                 new_image.close();
             }
         }
     };
-
-    // camera rotation lookup table
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray(4);
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }
 
     // event handler based on camera access result
     private CameraDevice.StateCallback state_callback = new CameraDevice.StateCallback()
@@ -108,11 +119,11 @@ public class CameraDeviceHelper
     // endregion Fields and Const
 
     // region Properties
-    public static CameraDeviceHelper getInstance()
+    public static CameraDeviceHelper getInstance(ObservableField<ImageModel> img)
     {
         if (_instance == null)
         {
-            _instance = new CameraDeviceHelper();
+            _instance = new CameraDeviceHelper(img);
         }
 
         return _instance;
@@ -121,8 +132,9 @@ public class CameraDeviceHelper
     //endregion Properties
 
     // region Constructor
-    private CameraDeviceHelper()
+    private CameraDeviceHelper(ObservableField<ImageModel> img)
     {
+        this.observableImage = img;
     }
     // endregion Constructor
 
@@ -161,9 +173,6 @@ public class CameraDeviceHelper
             this.image_reader = ImageReader.newInstance(image_size.getWidth(), image_size.getHeight(), ImageFormat.YUV_420_888, ControlConstants.MAX_NUM_OF_IMAGES_PER_PROCESS_INTERVAL);
             this.image_reader.setOnImageAvailableListener(this.imageAvailableListener, background_handler);
 
-            // compute preview rotation based on current sensor rotation and device rotation
-            this.net_orientation = calculate_rotation(characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION), deviceRotation);
-
             // obtain resolution
             this.dimension = map.getOutputSizes(SurfaceTexture.class) [0];
 
@@ -178,6 +187,14 @@ public class CameraDeviceHelper
         }
 
         return false;
+    }
+
+    public void CloseCamera()
+    {
+        this.texture = null;
+        this.cam_id = new String();
+
+        //TODO: Reinitialize all fields
     }
     // endregion APIs
 
@@ -251,14 +268,6 @@ public class CameraDeviceHelper
             }
         }
     }
-
-    //TODO: Use after testing
-    private int calculate_rotation(int sensorRotation, int deviceRotation)
-    {
-//        return (ORIENTATIONS.get(deviceRotation) + sensorRotation + 270) % 360;
-        return 0;
-    }
-
 
     // endregion Methods
 }

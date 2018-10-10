@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
+import android.databinding.ObservableField;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraManager;
 import android.support.annotation.NonNull;
@@ -15,21 +17,18 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.example.wangyulong.imagetrans.Constant.ControlConstants;
 import com.example.wangyulong.imagetrans.Controller.MainScreenController;
 import com.example.wangyulong.imagetrans.databinding.ActivityMainScreenBinding;
 
 import org.opencv.android.OpenCVLoader;
-import org.opencv.features2d.FastFeatureDetector;
 
 public class MainScreenActivity extends AppCompatActivity
 {
     //region Fields and Const
     private ActivityMainScreenBinding binding;     // binding class holding all view outlets
     private MainScreenController controller;
-    private native String stringFromJNI();
     //endregion Fields and Const
 
     //region Overrides
@@ -86,7 +85,7 @@ public class MainScreenActivity extends AppCompatActivity
     {
         this.controller = MainScreenController.get_instance();
 
-        // TODO: Link up event states
+        // TODO: Link up to event
         this.binding.textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener()
         {
             @Override
@@ -129,7 +128,25 @@ public class MainScreenActivity extends AppCompatActivity
                 controller.OpenCamera((CameraManager) getSystemService(Context.CAMERA_SERVICE), binding.textureView.getSurfaceTexture(), getWindowManager().getDefaultDisplay().getRotation());
             }
         });
-    }
+
+        this.controller.warning.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback()
+        {
+            @Override
+            public void onPropertyChanged(final Observable sender, int propertyId)
+            {
+                // run on UIThread, as UI elements can only be changed by UIThread
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run()
+                    {
+                        // set warning text
+                        binding.warningTxt.setText(((ObservableField<String>) sender).get());
+                    }
+                });
+            }
+        });
+}
 
     /* checks real-time permission for camera access */
     private void run_permission_check()
@@ -149,7 +166,7 @@ public class MainScreenActivity extends AppCompatActivity
     }
     //endregion Methods
 
-    // TODO: Remove afterwards
+    // region Load External Modules
     // Used to load the 'native-lib' library on application startup.
     static
     {
@@ -172,4 +189,6 @@ public class MainScreenActivity extends AppCompatActivity
             Log.d("MainScreenActivity : ", "OpenCV loaded");
         }
     }
+
+    // endregion Load External Modules
 }

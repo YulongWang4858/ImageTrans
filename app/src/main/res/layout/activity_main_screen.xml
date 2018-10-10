@@ -2,7 +2,6 @@
 <layout>
 
     <data>
-
     </data>
 
     <RelativeLayout
@@ -14,10 +13,20 @@
         android:layout_height="match_parent"
         tools:context="com.example.wangyulong.imagetrans.MainScreenActivity">
 
+        <TextView
+            android:id="@+id/warningTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorAccent"
+            android:textSize="20dp"
+            android:textStyle="bold"/>
+
         <TextureView
             android:id="@+id/textureView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_marginTop="30dp"/>
 
         <Button
             android:id="@+id/beginFeedButton"
