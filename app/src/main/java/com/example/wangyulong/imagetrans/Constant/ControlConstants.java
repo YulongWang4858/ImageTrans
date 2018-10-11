@@ -9,4 +9,6 @@ public class ControlConstants
     // value for camera device rotation and scaling
     public static final int HARDCODED_ROTATION = -90;
     public static final float HARDCODED_SCALING_X = new Float(1.1);
+    public static final String OPEN_CAMERA_TXT = "Open Camera";
+    public static final String CLOSE_CAMERA_TXT = "Close Camera";
 }

@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 
 import com.example.wangyulong.imagetrans.Constant.ControlConstants;
 import com.example.wangyulong.imagetrans.Controller.MainScreenController;
+import com.example.wangyulong.imagetrans.Enum.ControlStateEnum;
 import com.example.wangyulong.imagetrans.databinding.ActivityMainScreenBinding;
 
 import org.opencv.android.OpenCVLoader;
@@ -29,6 +30,7 @@ public class MainScreenActivity extends AppCompatActivity
     //region Fields and Const
     private ActivityMainScreenBinding binding;     // binding class holding all view outlets
     private MainScreenController controller;
+    private ControlStateEnum.ControlStates controlStates = ControlStateEnum.ControlStates.CAMERA_CLOSED;   //camera state initially set to closed
     //endregion Fields and Const
 
     //region Overrides
@@ -123,9 +125,24 @@ public class MainScreenActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                run_permission_check();
+                //
+                if (controlStates == ControlStateEnum.ControlStates.CAMERA_CLOSED)
+                {
+                    run_permission_check();
 
-                controller.OpenCamera((CameraManager) getSystemService(Context.CAMERA_SERVICE), binding.textureView.getSurfaceTexture(), getWindowManager().getDefaultDisplay().getRotation());
+                    controller.OpenCamera((CameraManager) getSystemService(Context.CAMERA_SERVICE), binding.textureView.getSurfaceTexture(), getWindowManager().getDefaultDisplay().getRotation());
+                    controlStates = ControlStateEnum.ControlStates.CAMERA_OPENED;
+
+                    binding.beginFeedButton.setText(ControlConstants.CLOSE_CAMERA_TXT);
+                }
+                else
+                {
+                    controller.CloseCamera();
+                    controlStates = ControlStateEnum.ControlStates.CAMERA_CLOSED;
+
+                    binding.beginFeedButton.setText(ControlConstants.OPEN_CAMERA_TXT);
+                    binding.warningTxt.setText("");
+                }
             }
         });
 
@@ -141,7 +158,10 @@ public class MainScreenActivity extends AppCompatActivity
                     public void run()
                     {
                         // set warning text
-                        binding.warningTxt.setText(((ObservableField<String>) sender).get());
+                        if (controlStates == ControlStateEnum.ControlStates.CAMERA_OPENED)
+                        {
+                            binding.warningTxt.setText(((ObservableField<String>) sender).get());
+                        }
                     }
                 });
             }

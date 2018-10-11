@@ -72,9 +72,6 @@ public class CameraDeviceHelper
                 imageModel.setNum_features(features_detected);
                 observableImage.set(imageModel);
 
-                // TODO: Remove after debug
-                Log.d("CameraDeviceHelper : ", "ImageAvailble --> features detected " + features_detected + " with by buffer length of " + byte_arr.length);
-
                 // must call close(), else fails after reading the first 5 images
                 new_image.close();
             }
@@ -195,6 +192,9 @@ public class CameraDeviceHelper
         this.cam_id = new String();
 
         //TODO: Reinitialize all fields
+        this.m_camera_device.close();
+        this.background_handler_thread.quit();
+        this.background_handler = null;
     }
     // endregion APIs
 
