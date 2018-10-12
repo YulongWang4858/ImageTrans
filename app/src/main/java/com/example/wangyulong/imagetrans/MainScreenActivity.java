@@ -125,14 +125,16 @@ public class MainScreenActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                //
+                // button toggles program state
                 if (controlStates == ControlStateEnum.ControlStates.CAMERA_CLOSED)
                 {
+                    // request for permission
                     run_permission_check();
 
                     controller.OpenCamera((CameraManager) getSystemService(Context.CAMERA_SERVICE), binding.textureView.getSurfaceTexture(), getWindowManager().getDefaultDisplay().getRotation());
                     controlStates = ControlStateEnum.ControlStates.CAMERA_OPENED;
 
+                    // updates view
                     binding.beginFeedButton.setText(ControlConstants.CLOSE_CAMERA_TXT);
                 }
                 else
@@ -140,12 +142,14 @@ public class MainScreenActivity extends AppCompatActivity
                     controller.CloseCamera();
                     controlStates = ControlStateEnum.ControlStates.CAMERA_CLOSED;
 
+                    // updates view
                     binding.beginFeedButton.setText(ControlConstants.OPEN_CAMERA_TXT);
                     binding.warningTxt.setText("");
                 }
             }
         });
 
+        // monitors visual cue
         this.controller.warning.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback()
         {
             @Override

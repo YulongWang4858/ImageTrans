@@ -2,8 +2,9 @@
 # documentation: https://d.android.com/studio/projects/add-native-code.html
 
 # Sets the minimum version of CMake required to build the native library.
-set(pathToProject /Users/wangyulong/AndroidStudioProjects/ImageTrans)
-set(pathToOpenCv /Users/wangyulong/Downloads/OpenCV-android-sdk)
+set(pathToProject ${PROJECT_SOURCE_DIR}/../)
+set(pathToOpenCv ${pathToProject}/ExternalSDK/include)
+
 cmake_minimum_required(VERSION 3.4.1)
 
 # Creates and names a library, sets it as either STATIC
@@ -15,7 +16,7 @@ cmake_minimum_required(VERSION 3.4.1)
 #set(CMAKE_VERBOSE_MAKEFILE on)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
-include_directories(${pathToOpenCv}/sdk/native/jni/include)
+include_directories(${pathToOpenCv})
 
 
 add_library( # Sets the name of the library.
